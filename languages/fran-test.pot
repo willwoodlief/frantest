@@ -1,0 +1,3 @@
+# Title of the Survey about to be taken
+msgid "blank-survey-title"
+msgstr "Welcome to the Survey!"

@@ -1,0 +1,77 @@
+/**
+ * All of the CSS for your public-facing functionality should be
+ * included in this file.
+ */
+
+.fran-test {
+    border: black solid 1px;
+    padding: 1em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.fran-test div.fran-test-html{
+    margin-bottom: 1em;
+}
+
+.fran-test .fran-test-custom-header {
+    margin-bottom: 1em;
+}
+
+.fran-test .fran-test-customized-header {
+    margin-bottom: 1em;
+}
+
+.fran-test .fran-test-questions-list {
+    font-size: 100%;
+}
+
+.fran-test .fran-test-question-block {
+
+}
+
+.fran-test .fran-test-question {
+    font-weight: bold;
+}
+
+.fran-test fieldset.fran-error {
+    border: red solid 1px;
+}
+
+.fran-test .fran-test-question-block .fran-test-question-number {
+    font-style: italic;
+    border-radius: 50%;
+    padding: 0.20em;
+    min-width: 2em;
+    background-color: rgba(14, 19, 255, 0.22);
+    display: inline-block;
+    text-align: center;
+}
+
+.fran-test .fran-test-question-bloc fieldset {
+    padding: 0;
+}
+
+.fran-test .fran-test-question-block .fran-test-actual-question {
+
+}
+
+.fran-test .fran-test-question-block .fran-test-answer-line {
+
+}
+
+.fran-test .fran-test-question-block .fran-test-radio:not(:first-child) {
+
+}
+
+.fran-test .fran-test-question-block .fran-test-radio-label {
+    display: inline-block;
+}
+
+.fran-test .fran-test-question-block .fran-test-radio-and-label {
+    display: inline-block;
+}
+
+.fran-test .fran-test-question-block .fran-test-radio-and-label:not(:first-child) {
+    margin-left: 2em;
+}

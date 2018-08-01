@@ -1,0 +1,78 @@
+version: 1.81
+questions:  #http://symfony.com/doc/current/components/yaml.html
+  - question: 'Which industry are you most interested in?'
+    limit: 1
+    answers:
+      - "Home-Based"
+      - "Fitness & Beauty"
+      - "Food & Beverage"
+      - "Business Services"
+      - "Health & Senior Care"
+      - "Children & Young Adults"
+      - "Residential Services"
+      - "Open to All Industries"
+  - question: 'Why are you most interested in opening a franchise?'
+    limit: 1,
+    answers:
+      - "Money"
+      - "Change of Career"
+      - "Lifestyle"
+      - "Flexibility"
+      - "Personal Challenge"
+      - "Need a Job"
+  - question: 'Who else is involved in the process?'
+    limit: 1,
+    answers:
+      - "Spouse"
+      - "Business Partner"
+      - "Family"
+      - "Friend"
+      - "None of the above"
+  - question: 'What is your current level of education?'
+    limit: 1,
+    answers:
+      - "High School Diploma"
+      - "Trade School/On the job training"
+      - "Associate’s Degree"
+      - "Bachelor’s Degree"
+      - "Post-Graduate Degree"
+  - question: 'Where are you in your career?'
+    limit: 1,
+    answers:
+      - "Student"
+      - "Entry-level Employee"
+      - "Management"
+      - "Senior Management"
+      - "Retired"
+      - "Unemployed"
+      - "Self-employed"
+  - question: 'Are you a homeowner?'
+    limit: 1,
+    answers:
+      - "Yes"
+      - "No"
+  - question: 'How is your credit? '
+    limit: 1,
+    answers:
+      - "It’s Great! (720+)"
+      - "It’s Good (680-719)"
+      - "It’s Okay (Below 680)"
+      - "I’m Not Sure"
+  - question: 'What is your budget to open a franchise? (cash available on-hand excluding any possible loans) '
+    limit: 1,
+    answers:
+      - "$25k - $50k"
+      - "$50k - $75k"
+      - "$75k - $100k"
+      - "$100k to $250k"
+      - "$250k+"
+  - question: 'Have you ever owned a business before?'
+    limit: 1,
+    answers:
+      - "Yes"
+      - "No"
+  - question: 'Have you ever looked into owning a franchise before?'
+    limit: 1,
+    answers:
+      - "Yes"
+      - "No"
