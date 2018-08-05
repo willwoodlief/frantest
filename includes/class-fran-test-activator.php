@@ -52,9 +52,27 @@ class Fran_Test_Activator {
 		global $wpdb;
 
 
+		//check to see if any tables are missing
+		$b_force_create = false;
+		$tables_to_check= ['fran_test_survey','fran_test_responses','fran_test_questions','fran_test_answers'];
+		foreach ($tables_to_check as $tb) {
+			$table_name = "{$wpdb->base_prefix}$tb";
+			//check if table exists
+			if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+				$b_force_create = true;
+			}
+		}
+
+		$b_force_load_questions = false;
+		//if questions table not there yet, flag specifically so we can load in the questions
+		$table_name = "{$wpdb->base_prefix}fran_test_questions";
+		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+			$b_force_load_questions = true;
+		}
+
 
 		$installed_ver = floatval( get_option( "_fran_test_db_version" ));
-		if ( Fran_Test_Activator::DB_VERSION > $installed_ver ) {
+		if ( ($b_force_create) || ( Fran_Test_Activator::DB_VERSION > $installed_ver) ) {
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 			$charset_collate = $wpdb->get_charset_collate();
 
@@ -88,10 +106,10 @@ class Fran_Test_Activator {
               answer_limit int default 0,
               created_at datetime NOT NULL,
               updated_at datetime default NULL,
-              shortcode varchar(50)
+              shortcode varchar(50),
               question text not null,
               PRIMARY KEY  (id),
-              KEY is_obsolete_key (is_obsolete)
+              KEY is_obsolete_key (is_obsolete),
               KEY shortcode_key (shortcode)
               ) $charset_collate;";
 
@@ -107,7 +125,7 @@ class Fran_Test_Activator {
               answer text not null,
               created_at datetime NOT NULL,
               PRIMARY KEY  (id),
-              KEY question_id_key (question_id),
+              KEY question_id_key (question_id)
               ) $charset_collate;";
 
 			dbDelta( $sql );
@@ -134,7 +152,7 @@ class Fran_Test_Activator {
 
 		$installed_questions_ver = floatval(get_option( "_fran_test_question_version" ));
 		$questions = Fran_Test_Activator::load_questions_from_yaml();
-		if ($questions['version'] > $installed_questions_ver) {
+		if ($b_force_load_questions || ($questions['version'] > $installed_questions_ver)) {
 			// if the questions version is greater than the last question version then mark the older questions as obsolete
 			try {
 				$wpdb->query('START TRANSACTION');
@@ -185,27 +203,29 @@ class Fran_Test_Activator {
 					$new_question_id = $wpdb->insert_id;
 
 					$answers = $q_node['answers'];
-					foreach ( $answers as $an_answer ) {
-						$last_id = $wpdb->insert(
-							$wpdb->base_prefix . 'fran_test_answers',
-							array(
-								'question_id' => $new_question_id,
-								'answer'      => $an_answer,
-								'created_at'  => date( "Y-m-d H:m:s", time() ),
-							),
-							array(
-								'%s',
-								'%s',
-								'%s'
-							)
-						);
+					if (!empty($answers)) {
+						foreach ( $answers as $an_answer ) {
+							$last_id = $wpdb->insert(
+								$wpdb->base_prefix . 'fran_test_answers',
+								array(
+									'question_id' => $new_question_id,
+									'answer'      => $an_answer,
+									'created_at'  => date( "Y-m-d H:m:s", time() ),
+								),
+								array(
+									'%s',
+									'%s',
+									'%s'
+								)
+							);
 
-						if ( $wpdb->last_error ) {
-							throw new Exception( $wpdb->last_error );
-						}
+							if ( $wpdb->last_error ) {
+								throw new Exception( $wpdb->last_error );
+							}
 
-						if ( $last_id === false ) {
-							throw new Exception( "Could not create new Answer" );
+							if ( $last_id === false ) {
+								throw new Exception( "Could not create new Answer" );
+							}
 						}
 					}
 				}

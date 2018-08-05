@@ -16,7 +16,7 @@
  * Plugin Name:       Franchise Test
  * Plugin URI:        mailto:willwoodlief@gmail.com
  * Description:       Offers a survey and pushes results to hubspot
- * Version:           1.0.1
+ * Version:           1.0.2
  * Author:            Will Woodlief
  * Author URI:        willwoodlief@gmail.com
  * License:           GPL-2.0+
