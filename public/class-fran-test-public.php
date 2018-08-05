@@ -65,7 +65,6 @@ class Fran_Test_Public
     public function enqueue_styles()
     {
 
-
         wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/fran-test-public.css', array(), $this->version, 'all');
 
     }
@@ -78,10 +77,11 @@ class Fran_Test_Public
     public function enqueue_scripts()
     {
 
-        wp_enqueue_script($this->plugin_name, plugin_dir_url(__DIR__) . 'lib/Chart.min.js', array('jquery'), $this->version, false);
-        wp_enqueue_script($this->plugin_name. 'a', plugin_dir_url(__FILE__) . 'js/fran-test-public.js', array('jquery'), $this->version, false);
+        //wp_enqueue_script($this->plugin_name, plugin_dir_url(__DIR__) . 'lib/Chart.min.js', array('jquery'), $this->version, false);
+	    wp_enqueue_script($this->plugin_name. 'b', plugin_dir_url(__FILE__) . 'js/js.cookie.js', array(), $this->version, false);
+        wp_enqueue_script($this->plugin_name. 'a', plugin_dir_url(__FILE__) . 'js/fran-test-public-test.js', array('jquery'), $this->version, false);
         $title_nonce = wp_create_nonce('fran_test_chart');
-        wp_localize_script('fran-test', 'fran_test_chart_ajax_obj', array(
+        wp_localize_script($this->plugin_name. 'a', 'fran_test_frontend_ajax_obj', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'action' => 'fran_test_submit_chart_step',
             'nonce' => $title_nonce,
@@ -89,98 +89,74 @@ class Fran_Test_Public
 
     }
 
-    //JSON
-    function send_survey_ajax_handler()
-    {
-        global $survey_obj;
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/fran-test-survey-new.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/fran-test-survey-completed.php';
 
-        check_ajax_referer('fran_test_chart');
-        $dob = null;
-        if (array_key_exists('dob_ts',$_POST) && !empty($_POST['dob_ts'])) {
-            $dob = intval($_POST['dob_ts']);
-        }
-        $code = null;
-        if (array_key_exists( 'code',$_POST) && !empty($_POST['code'])) {
-            $code = sanitize_text_field($_POST['code']);
-        }
+    public function send_survey_ajax_handler() {
 
-        if (array_key_exists( 'state',$_POST) && $_POST['state'] == 'start') {
+	    require_once plugin_dir_path(dirname(__FILE__)) . 'public/fran-test-public-questions.php';
 
-            if ($code && $dob) {
-                //try to find a completed survey
-                $survey_obj = new FranSurveyCompleted($dob, $code);
-                ob_start();
-                require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/fran-test-public-chart.php';
-                $html = ob_get_contents();
-                ob_end_clean();
-                wp_send_json(['is_valid' => true, 'html' => $html, 'message' => 'finished survey page', "state" => "finished_survey_page"]);
-                die();
-            } else if ($code) {
-                $text = get_option('fran_test_not_found_text');
-                wp_send_json(['is_valid' => false, 'html' => $text, "state" => "missing_dob"]);
-                die();
-            } elseif(!$dob) {
-                wp_send_json(['is_valid' => false, 'message' => "start without dob"]);
-            } else {
-                try {
-                    $survey_obj = new FranSurvey($dob);
-                    $survey_obj->load_questions_of_section('vitacheck');
-                } catch (Exception $e) {
-                    wp_send_json(['is_valid' => false, 'message' => $e->getMessage(), 'trace'=>$e->getTrace(), ]);
-                    die();
-                }
-                ob_start();
-                require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/fran-test-public-questions.php';
-                $html = ob_get_contents();
-                ob_end_clean();
-                wp_send_json(['is_valid' => true, 'html' => $html, 'message' => 'starting survey vitacheck', "state" => "survey_page"]);
-                die();
-            }
+	    check_ajax_referer( 'fran_test_chart' );
+
+	    if (array_key_exists( 'method',$_POST) && $_POST['method'] == 'survey_answer') {
+
+		    try {
+			    $survey_id = sanitize_text_field($_POST['survey_id']);
+			    $question_id = sanitize_text_field($_POST['question_id']);
+			    $answer_id = sanitize_text_field($_POST['answer_id']);
+			    $response_id = FranTestPublic::update_answer($survey_id,$question_id,$answer_id);
+
+			    wp_send_json(['is_valid' => true, 'data' => $response_id, 'action' => 'updated_survey_answer']);
+			    die();
+		    } catch (Exception $e) {
+			    wp_send_json(['is_valid' => false, 'message' => $e->getMessage(), 'trace'=>$e->getTrace(), 'action' => 'stats' ]);
+			    die();
+		    }
+	    }
+	    elseif  (array_key_exists( 'method',$_POST) && $_POST['method'] == 'survey_words') {
+		    try {
+			    $survey_id = sanitize_text_field($_POST['survey_id']);
+			    if (array_key_exists('name',$_POST)) {
+				    $name = sanitize_text_field($_POST['name']);
+			    } else {
+				    $name = null;
+			    }
+
+			    if (array_key_exists('email',$_POST)) {
+				    $email = sanitize_text_field($_POST['email']);
+			    } else {
+					$email = null;
+			    }
+
+			    if (array_key_exists('phone',$_POST)) {
+				    $phone = sanitize_text_field($_POST['phone']);
+			    } else {
+					$phone = null;
+			    }
 
 
-        } elseif (array_key_exists( 'state',$_POST) && $_POST['state'] == 'vitacheck') {
+			    $response_id = FranTestPublic::update_words($survey_id,$name,$email,$phone);
 
-            try {
-                $survey_obj = new FranSurvey(null, $code);
-                $answers =$survey_obj->save_answers_from_post();
-                $survey_obj->load_questions_of_section('psychologische');
-            } catch (Exception $e) {
-                wp_send_json(['is_valid' => false, 'message' => $e->getMessage(), 'trace'=>$e->getTrace(), ]);
-                die();
-            }
-            ob_start();
-            require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/fran-test-public-questions.php';
-            $html = ob_get_contents();
-            ob_end_clean();
-            wp_send_json(['is_valid' => true, 'html' => $html, 'message' => 'starting survey psychologische', "state" => "survey_page",'processed_answers'=>$answers]);
-            die();
-        } elseif (array_key_exists( 'state',$_POST) && $_POST['state'] == 'psychologische') {
+			    wp_send_json(['is_valid' => true, 'update_count' => $response_id, 'action' => 'updated_survey_words']);
+			    die();
+		    } catch (Exception $e) {
+			    wp_send_json(['is_valid' => false, 'message' => $e->getMessage(), 'trace'=>$e->getTrace(), 'action' => 'stats' ]);
+			    die();
+		    }
+	    }
 
-            try {
-                $survey_obj = new FranSurvey(null, $code);
-                $answers = $survey_obj->save_answers_from_post();
-                $survey_obj->calculate_and_close_survey();
-            } catch (Exception $e) {
-                wp_send_json(['is_valid' => false, 'message' => $e->getMessage(), 'trace'=>$e->getTrace(), ]);
-                die();
-            }
-            $survey_obj = new FranSurveyCompleted(null, $code,true);
-            ob_start();
-            require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/fran-test-public-chart.php';
-            $html = ob_get_contents();
-            ob_end_clean();
-            wp_send_json(['is_valid' => true, 'html' => $html, 'message' => 'finished survey page', "state" => "finished_survey_page",'processed_answers'=>$answers]);
-            die();
-        }
-
-        wp_send_json(['is_valid' => true, 'message' => "hi", 'test' => $_POST['test']]);
+	    else {
+		    //unrecognized
+		    wp_send_json(['is_valid' => false, 'message' => "unknown action"]);
+		    die();
+	    }
     }
+
+    //JSON
+
 
     public function shortcut_code()
     {
         add_shortcode($this->plugin_name, array($this, 'manage_shortcut'));
+
     }
 
     /**
@@ -215,8 +191,7 @@ class Fran_Test_Public
             $fran_test_custom_header .= apply_filters('the_content', $expanded__other_shortcodes);
 
         }
-
-	                    require_once plugin_dir_path(dirname(__FILE__)) . 'public/fran-test-public-questions.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/fran-test-public-questions.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/fran-test-before-submit.php';
 
 

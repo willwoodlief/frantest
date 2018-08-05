@@ -158,13 +158,6 @@ class Fran_Test_Admin {
 	    );
 
 
-	    add_settings_field(
-		    'is_listening',
-		    'Is This Listening?',
-		    array( $this, 'listening_callback' ),
-		    'fran-test-options',
-		    'fran_setting_section_id'
-	    );
 
 	    add_settings_field(
 		    'allowed_colors', // ID
@@ -174,23 +167,31 @@ class Fran_Test_Admin {
 		    'fran_setting_section_id' // Section
 	    );
 
+	    add_settings_field(
+		    'text_color', // ID
+		    'Text Color', // Title
+		    array( $this, 'text_color_callback' ), // Callback
+		    'fran-test-options', // Page
+		    'fran_setting_section_id' // Section
+	    );
+
+
+	    add_settings_field(
+		    'redirect_url', // ID
+		    'Redirect', // Title
+		    array( $this, 'redirect_url_callback' ), // Callback
+		    'fran-test-options', // Page
+		    'fran_setting_section_id' // Section
+	    );
+
+
+
 
 
 
     }
 
 
-	public function listening_callback() {
-
-		$setting = isset( $this->options['is_listening'] ) ? esc_attr( $this->options['is_listening']) : 0;
-		$checked = checked( 1, $setting, false );
-
-		printf(
-			'<input type="checkbox" id="is_listening" name="fran_test_options[is_listening]" value="1" %s />',
-			$checked
-		);
-
-	}
 
 	public function allowed_colors_callback() {
 
@@ -200,17 +201,68 @@ class Fran_Test_Admin {
 		}
 		$lines_as_one_string = implode(" , ",$array);
 
+		$color_show = "<div>";
+		foreach ($array as $a_color) {
+			$color_show .= "<div style='display:inline-block; background-color: $a_color; width: 1em; height: 1em;margin-left: 0.25em'> </div>";
+		}
+
 		printf(
 			'
 					<div style="display: inline-block">
  						<input type="text" value="%s" id="allowed_colors" name="fran_test_options[allowed_colors]" size="60" >
  						<br>
  						<span style="font-size: smaller">Colors </span>
+                    </div>
+                    %s',
+			$lines_as_one_string,$color_show
+		);
+	}
+
+	public function text_color_callback() {
+
+		if (array_key_exists('text_color',$this->options)) {
+			$redir =  $this->options['text_color'] ;
+		} else {
+			$redir =  '' ;
+		}
+
+
+		printf(
+			'
+					<div style="display: inline-block">
+ 						<input type="text" value="%s" id="text_color" name="fran_test_options[text_color]" size="60" >
+ 						<br>
+ 						<span style="font-size: smaller"> Text Color </span>
                     </div>',
-			$lines_as_one_string
+			$redir
+		);
+	}
+
+
+
+	public function redirect_url_callback() {
+
+    	if (array_key_exists('redirect_url',$this->options)) {
+		    $redir =  $this->options['redirect_url'] ;
+	    } else {
+		    $redir =  '' ;
+	    }
+
+
+		printf(
+			'
+					<div style="display: inline-block">
+ 						<input type="url" value="%s" id="redirect_url" name="fran_test_options[redirect_url]" size="60" >
+ 						<br>
+ 						<span style="font-size: smaller"> Where do you want the user to go after the survey ? </span>
+                    </div>',
+			$redir
 		);
 
 	}
+
+
+
 
 	/**
 	 * Sanitize each setting field as needed
@@ -249,6 +301,22 @@ class Fran_Test_Admin {
 		} else {
 			$new_input['is_listening'] = '0' ;
 		}
+
+
+		if( isset( $input['redirect_url'] ) ) {
+			$new_input['redirect_url'] = sanitize_text_field( $input['redirect_url'] );
+		} else {
+			$new_input['redirect_url'] = '' ;
+		}
+
+
+		if( isset( $input['text_color'] ) ) {
+			$new_input['text_color'] = sanitize_text_field( $input['text_color'] );
+		} else {
+			$new_input['text_color'] = '' ;
+		}
+
+
 
 
 

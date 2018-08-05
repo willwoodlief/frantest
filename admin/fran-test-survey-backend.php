@@ -84,6 +84,7 @@ class FranSurveyBackend
 
         global $wpdb;
         $table_name = $wpdb->prefix . 'fran_test_survey';
+        $responses_table = $wpdb->prefix . 'fran_test_responses';
 
         $where_clause = '';
         $search_value = trim($search_value);
@@ -98,10 +99,16 @@ class FranSurveyBackend
         $sort_by_clause = " order by id asc";
         $sort_by = trim($sort_by);
         $sort_direction = intval($sort_direction);
+        if ($sort_by === 'is_completed') {
+        	$sort_by = 'number_completed';
+        }
         if ($sort_by) {
             switch ($sort_by) {
 
+	            case 'number_completed':
                 case 'created_at':
+	            case 'created_at_ts':
+	            case 'survey_email':
                 case 'anon_key': {
                      if ($sort_direction > 0) {
                          $sort_by_clause = " ORDER BY $sort_by ASC ";
@@ -132,9 +139,13 @@ class FranSurveyBackend
 
         $res = $wpdb->get_results( /** @lang text */
                             "
-                select id,anon_key, 
-                  UNIX_TIMESTAMP(created_at) as created_at_ts
-                from $table_name where ( is_completed = 1 ) 
+                select id,anon_key, full_name,phone,survey_email,is_completed,
+                  UNIX_TIMESTAMP(created_at) as created_at_ts,
+                  (answer_count) as number_completed
+                from $table_name s  
+                INNER JOIN (
+                 select count(*) as answer_count,survey_id from $responses_table a  group by survey_id 
+                ) as completed ON completed.survey_id = s.id
                 $where_clause $sort_by_clause  $offset_clause;"
         );
 
@@ -162,14 +173,14 @@ class FranSurveyBackend
     public static function get_details_of_one($survey_id) {
         global $wpdb;
         $survey_table_name = $wpdb->prefix . 'fran_test_survey';
-        $response_table_name = $wpdb->prefix . 'wp_fran_test_responses';
+        $response_table_name = $wpdb->prefix . 'fran_test_responses';
         $answer_table_name = $wpdb->prefix . 'fran_test_answers';
         $question_table_name = $wpdb->prefix . 'fran_test_questions';
         $survey_id = intval($survey_id);
 
         /** @noinspection SqlResolve */
         $survey_res = $wpdb->get_results("
-        select id,anon_key,dob,created_at
+        select id,anon_key,created_at,full_name,survey_email,phone
         from $survey_table_name where id = $survey_id;
         ");
 
@@ -185,6 +196,7 @@ class FranSurveyBackend
 						r.id as response_id,
 						q.id as question_id,
 						q.question,
+						q.shortcode,
 						a.id as answer_id,
 						a.answer
 						from $survey_table_name s
@@ -202,7 +214,10 @@ class FranSurveyBackend
         $answers_array = [];
         foreach ($answers_res as $answer) {
             $node = ['question'=> $answer->question,'question_id'=> $answer->question_id,
-                     'answer'=> $answer->answer,"answer_id"=>$answer->answer_id,"response_id"=>$answer->response_id];
+                     'answer'=> $answer->answer,"answer_id"=>$answer->answer_id,
+                     "response_id"=>$answer->response_id,
+	                "shortcode" => $answer->shortcode
+	            ];
 
             array_push($answers_array,$node);
         }

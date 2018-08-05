@@ -3,75 +3,60 @@
  * included in this file.
  */
 
-.fran-test {
-    border: black solid 1px;
-    padding: 1em;
-    margin-top: 2em;
-    margin-bottom: 2em;
-}
-
-.fran-test div.fran-test-html{
-    margin-bottom: 1em;
-}
-
-.fran-test .fran-test-custom-header {
-    margin-bottom: 1em;
-}
-
-.fran-test .fran-test-customized-header {
-    margin-bottom: 1em;
-}
-
-.fran-test .fran-test-questions-list {
-    font-size: 100%;
-}
-
-.fran-test .fran-test-question-block {
+div.fran-test-public-wrapper {
 
 }
 
-.fran-test .fran-test-question {
+div.fran-test-public-wrapper  div.fran-test-quiz-holder {
+
+}
+
+div.fran-test-public-wrapper  div.fran-test-quiz-holder  div.fran-test-question {
+
+}
+
+div.fran-test-public-wrapper  div.fran-test-quiz-holder  div.fran-test-question {
+
+}
+
+div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers {
+
+}
+
+div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-base {
+    display: inline-block;
     font-weight: bold;
-}
-
-.fran-test fieldset.fran-error {
-    border: red solid 1px;
-}
-
-.fran-test .fran-test-question-block .fran-test-question-number {
-    font-style: italic;
-    border-radius: 50%;
-    padding: 0.20em;
-    min-width: 2em;
-    background-color: rgba(14, 19, 255, 0.22);
-    display: inline-block;
     text-align: center;
+    color: white;
+    vertical-align: top;
+    cursor: pointer;
 }
 
-.fran-test .fran-test-question-bloc fieldset {
-    padding: 0;
+div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-binary {
+    width:30%;
+    padding: 5% ;
+    margin: 5%;
 }
 
-.fran-test .fran-test-question-block .fran-test-actual-question {
+div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-few {
+    width:18em;
+    padding: 1em ;
+    margin-bottom: .5em;
+    display: block;
+}
+
+div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-multiple {
+    width: 10em;
+    height: 9em;
+    padding: 1.5em ;
+    margin: 0.5em;
 
 }
 
-.fran-test .fran-test-question-block .fran-test-answer-line {
-
+div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-highlight {
+    border: black 2px solid;
 }
 
-.fran-test .fran-test-question-block .fran-test-radio:not(:first-child) {
-
-}
-
-.fran-test .fran-test-question-block .fran-test-radio-label {
-    display: inline-block;
-}
-
-.fran-test .fran-test-question-block .fran-test-radio-and-label {
-    display: inline-block;
-}
-
-.fran-test .fran-test-question-block .fran-test-radio-and-label:not(:first-child) {
-    margin-left: 2em;
+div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-ask-words {
+    display: none;
 }

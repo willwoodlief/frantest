@@ -98,10 +98,25 @@
     var brandFormatter = function (row, cell, value, columnDef, dataContext) {
         return dataContext.brand.name;
     };
+
+    function CheckmarkFormatter(row, cell, value, columnDef, dataContext) {
+        if (value === '0') {
+
+            return dataContext.number_completed;
+        }
+        return value === '1' ? "<img src='../wp-content/plugins/fran-test/admin/css/tick.png'>" : "";
+    }
+
     var my_columns = [
 
         {id: "created_at_ts", name: "created at", field: "created_at_ts", formatter: dateFormatter, width: 90, sortable: true},
-        {id: "anon_key", name: "anon key", field: "anon_key", formatter: null, width: 160, sortable: true}
+        {id: "anon_key", name: "Key", field: "anon_key", formatter: null, width: 80, sortable: true},
+        {id: "full_name", name: "Name", field: "full_name", formatter: null, width: 160, sortable: true},
+        {id: "survey_email", name: "Email", field: "survey_email", formatter: null, width: 200, sortable: true},
+        {id: "phone", name: "Phone", field: "phone", formatter: null, width: 100, sortable: true},
+        {id: "is_completed", name: "Completed", field: "is_completed", formatter: CheckmarkFormatter, width: 100, sortable: true}
+
+
 
 
     ];
@@ -163,6 +178,7 @@
         grid.onClick.subscribe(function (e, args) {
             grid.setSelectedRows([args.row]);
             var tim = grid.getDataItem(args.row);
+
             fran_test_talk_to_backend('detail', {id:tim.id}, function (data){
                 jQuery('div.fran-test-details-here').html(data.html);
             });

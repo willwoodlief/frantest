@@ -30,7 +30,7 @@ class Fran_Test_Activator {
 	 * @since    1.0.0
 	 */
 
-	const DB_VERSION = 1.91;
+	const DB_VERSION = 2.62;
 
 	/**
 	 * @return array
@@ -60,16 +60,20 @@ class Fran_Test_Activator {
 
 			//do main survey table
 
-			$sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->base_prefix}fran_test_survey` (
+			$sql = "CREATE TABLE `{$wpdb->base_prefix}fran_test_survey` (
               id int NOT NULL AUTO_INCREMENT,
               anon_key varchar(10) DEFAULT NULL,
               created_at datetime NOT NULL,
-              completed_at datetime  NULL,
+              completed_at datetime NULL,
               is_completed int NOT NULL default 0,
+              survey_email varchar(80) default NULL,
+              full_name text default NULL,
+              phone text default NULL,
               comments text default NULL,
               PRIMARY KEY  (id),
-              UNIQUE    (anon_key),
-              key (is_completed)
+              UNIQUE KEY anon_key (anon_key),
+              key is_completed_key (is_completed),
+              key email_key (survey_email)
             ) $charset_collate;";
 
 
@@ -78,15 +82,17 @@ class Fran_Test_Activator {
 			//do questions table
 
 
-			$sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->base_prefix}fran_test_questions` (
+			$sql = "CREATE TABLE `{$wpdb->base_prefix}fran_test_questions` (
               id int NOT NULL AUTO_INCREMENT,
-              question text not null,
               is_obsolete int NOT NULL default 0,
               answer_limit int default 0,
               created_at datetime NOT NULL,
               updated_at datetime default NULL,
+              shortcode varchar(50)
+              question text not null,
               PRIMARY KEY  (id),
-              KEY    (is_obsolete)
+              KEY is_obsolete_key (is_obsolete)
+              KEY shortcode_key (shortcode)
               ) $charset_collate;";
 
 			dbDelta( $sql );
@@ -95,16 +101,13 @@ class Fran_Test_Activator {
 
 			//do answers table
 
-			$sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->base_prefix}fran_test_answers` (
+			$sql = "CREATE TABLE `{$wpdb->base_prefix}fran_test_answers` (
               id int NOT NULL AUTO_INCREMENT,
               question_id int not null ,
               answer text not null,
               created_at datetime NOT NULL,
               PRIMARY KEY  (id),
-              KEY  (question_id),
-              CONSTRAINT  FOREIGN KEY fk_answer_has_question(question_id) REFERENCES {$wpdb->base_prefix}fran_test_questions(id)
-                ON  UPDATE CASCADE 
-                ON DELETE RESTRICT
+              KEY question_id_key (question_id),
               ) $charset_collate;";
 
 			dbDelta( $sql );
@@ -112,24 +115,16 @@ class Fran_Test_Activator {
 
 			//do response table
 
-			$sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->base_prefix}fran_test_responses` (
+			$sql = "CREATE TABLE `{$wpdb->base_prefix}fran_test_responses` (
               id int NOT NULL AUTO_INCREMENT,
               survey_id int not null ,
               question_id int not null ,
               answer_id int not null,
               PRIMARY KEY  (id),
-              KEY (survey_id),
-              KEY  (question_id),
-              UNIQUE (survey_id,question_id),
-              CONSTRAINT  FOREIGN KEY fk_response_has_answer(answer_id) REFERENCES {$wpdb->base_prefix}fran_test_answers(id)
-                ON  UPDATE CASCADE 
-                ON DELETE RESTRICT,
-              CONSTRAINT  FOREIGN KEY fk_response_has_question(question_id) REFERENCES {$wpdb->base_prefix}fran_test_questions(id)
-                ON  UPDATE CASCADE 
-                ON DELETE RESTRICT,
-              CONSTRAINT  FOREIGN KEY fk_response_has_survey(survey_id) REFERENCES {$wpdb->base_prefix}fran_test_survey(id)
-                ON  UPDATE CASCADE 
-                ON DELETE RESTRICT  
+              KEY survey_id_key (survey_id),
+              KEY question_id_key (question_id),
+              KEY answer_id_key (answer_id),
+              UNIQUE KEY unique_survey_question (survey_id,question_id)
               ) $charset_collate;";
 
 			dbDelta( $sql );
@@ -158,14 +153,19 @@ class Fran_Test_Activator {
 
 				$questions_array = $questions['questions'];
 				foreach ($questions_array as $q_node ) {
+					if (!isset($q_node['question'])) {
+						throw new Exception("questions.yaml missing the question in the format designed");
+					}
 					$da_words = $q_node['question'];
-					$da_limit = $q_node['limit'];
+					$da_limit = isset($q_node['limit']) ? $q_node['limit'] : 1;
+					$ladeda_shortcode = isset($q_node['shortcode']) ? $q_node['shortcode'] : 'none';
 
 					$last_id = $wpdb->insert(
 						$wpdb->base_prefix . 'fran_test_questions',
 						array(
 							'question' => $da_words,
 							'answer_limit'      => $da_limit,
+							'shortcode' => $ladeda_shortcode,
 							'created_at'  => date( "Y-m-d H:m:s", time() )
 						),
 						array(
@@ -191,7 +191,7 @@ class Fran_Test_Activator {
 							array(
 								'question_id' => $new_question_id,
 								'answer'      => $an_answer,
-								'created_at'  => date( "Y-m-d H:m:s", time() )
+								'created_at'  => date( "Y-m-d H:m:s", time() ),
 							),
 							array(
 								'%s',

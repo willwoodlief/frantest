@@ -70,6 +70,20 @@ register_deactivation_hook( __FILE__, 'deactivate_fran_test' );
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-fran-test.php';
 
+
+
+
+add_filter( 'do_parse_request', 'fran_test_help_survey_route', 1, 3 );
+function fran_test_help_survey_route( $continue, WP $wp, $extra_query_vars ) {
+	if ( preg_match( '~(.*)\\/survey-(.+)$~', $_SERVER['REQUEST_URI'],$matches ) ) {
+		header("Location: " . $matches[1] . '?survey-step='. $matches[2]);
+		//convert it to a query string
+		die();
+	}
+
+	return $continue;
+}
+
 /**
  * Begins execution of the plugin.
  *

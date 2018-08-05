@@ -33,7 +33,7 @@ class ComposerStaticInitee33dc9cddd09d510e2b381e6ed117fc
         ),
         'Hashids\\' => 
         array (
-            0 => __DIR__ . '/..' . '/hashids/hashids/src',
+            0 => __DIR__ . '/..' . '/hashids/hashids/lib/Hashids',
         ),
     );
 
