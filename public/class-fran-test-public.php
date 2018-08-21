@@ -85,6 +85,7 @@ class Fran_Test_Public
             'ajax_url' => admin_url('admin-ajax.php'),
             'action' => 'fran_test_submit_chart_step',
             'nonce' => $title_nonce,
+            'plugins_url' => plugins_url()
         ));
 
     }
@@ -114,10 +115,16 @@ class Fran_Test_Public
 	    elseif  (array_key_exists( 'method',$_POST) && $_POST['method'] == 'survey_words') {
 		    try {
 			    $survey_id = sanitize_text_field($_POST['survey_id']);
-			    if (array_key_exists('name',$_POST)) {
-				    $name = sanitize_text_field($_POST['name']);
+			    if (array_key_exists('first_name',$_POST)) {
+				    $first_name = sanitize_text_field($_POST['first_name']);
 			    } else {
-				    $name = null;
+				    $first_name = null;
+			    }
+
+			    if (array_key_exists('last_name',$_POST)) {
+				    $last_name = sanitize_text_field($_POST['last_name']);
+			    } else {
+				    $last_name = null;
 			    }
 
 			    if (array_key_exists('email',$_POST)) {
@@ -133,7 +140,7 @@ class Fran_Test_Public
 			    }
 
 
-			    $response_id = FranTestPublic::update_words($survey_id,$name,$email,$phone);
+			    $response_id = FranTestPublic::update_words($survey_id,$first_name,$last_name,$email,$phone,$hubspot_response);
 
 			    wp_send_json(['is_valid' => true, 'update_count' => $response_id, 'action' => 'updated_survey_words']);
 			    die();

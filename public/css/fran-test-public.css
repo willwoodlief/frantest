@@ -4,22 +4,33 @@
  */
 
 div.fran-test-public-wrapper {
-
+    min-height: 30em;
 }
 
 div.fran-test-public-wrapper  div.fran-test-quiz-holder {
+    text-align: center;
+}
 
+div.fran-test-public-wrapper  div.frant-test-progress-detail {
+    width: 100%;
+    text-align: center;
 }
 
 div.fran-test-public-wrapper  div.fran-test-quiz-holder  div.fran-test-question {
-
+    font-weight: bold;
+    font-size: 2em;
 }
 
 div.fran-test-public-wrapper  div.fran-test-quiz-holder  div.fran-test-question {
-
+    margin-bottom: 1em;
+    text-align: center;
+    line-height: 1.25em;
 }
 
 div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers {
+    text-align: center;
+    margin: auto;
+    max-width: 900px;
 
 }
 
@@ -34,8 +45,8 @@ div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers di
 
 div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-binary {
     width:30%;
-    padding: 5% ;
-    margin: 5%;
+    padding:  5%;
+    margin: 0 5% 5%;
 }
 
 div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-few {
@@ -43,6 +54,8 @@ div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers di
     padding: 1em ;
     margin-bottom: .5em;
     display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-multiple {
@@ -53,10 +66,41 @@ div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers di
 
 }
 
+div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers[min-width~="799px"] div.fran-test-multiple {
+
+}
+
 div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-highlight {
     border: black 2px solid;
 }
 
 div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers div.fran-test-ask-words {
     display: none;
+}
+
+div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-ask-words {
+    text-align: center;
+    margin:0 auto;
+    background:white;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+
+
+
+
+
+div.fran-test-ask-words input {
+    display: inline-block !important;
+    font-size: 2em;
+    width: 20em;
+    padding-left: 1em;
+    margin-bottom: .25em;
+}
+
+
+div.fran-test-ask-words .big-button2 {
+    margin-top: 0.3em;
+    font-size: 2em;
+    width: 20em;
 }

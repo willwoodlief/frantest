@@ -158,6 +158,13 @@ class Fran_Test_Admin {
 	    );
 
 
+	    add_settings_field(
+		    'hubspot_api', // ID
+		    'Hub Spot API Key', // Title
+		    array( $this, 'hubspot_api_callback' ), // Callback
+		    'fran-test-options', // Page
+		    'fran_setting_section_id' // Section
+	    );
 
 	    add_settings_field(
 		    'allowed_colors', // ID
@@ -185,13 +192,43 @@ class Fran_Test_Admin {
 	    );
 
 
-
+	    add_settings_field(
+		    'email_alerts', // ID
+		    'Email Notices ', // Title
+		    array( $this, 'email_alerts_callback' ), // Callback
+		    'fran-test-options', // Page
+		    'fran_setting_section_id' // Section
+	    );
 
 
 
     }
 
 
+	public function email_alerts_callback() {
+
+    	if (array_key_exists('email_alerts',$this->options)) {
+		    $array =  $this->options['email_alerts'] ;
+	    } else {
+		    $array =  [] ;
+	    }
+
+		if (!is_array($array)) {
+			$array = [$array];
+		}
+		$lines_as_one_string = implode("\n",$array);
+
+		printf(
+			'
+					<div style="display: inline-block">
+ 						<textarea  id="email_alerts" name="fran_test_options[email_alerts]" rows="4" cols="55" >%s</textarea>
+ 						<br>
+ 						<span style="font-size: smaller">One address per line. Each will be sent   the completed surveys</span>
+                    </div>',
+			$lines_as_one_string
+		);
+
+	}
 
 	public function allowed_colors_callback() {
 
@@ -215,6 +252,29 @@ class Fran_Test_Admin {
                     </div>
                     %s',
 			$lines_as_one_string,$color_show
+		);
+	}
+
+
+
+
+	public function hubspot_api_callback() {
+
+		if (array_key_exists('hubspot_api',$this->options)) {
+			$api_key =  $this->options['hubspot_api'] ;
+		} else {
+			$api_key =  '' ;
+		}
+
+
+		printf(
+			'
+					<div style="display: inline-block">
+ 						<input type="text" value="%s" id="hubspot_api" name="fran_test_options[hubspot_api]" size="60" >
+ 						<br>
+ 						<span style="font-size: smaller"> The HubSpot API Key found in Hubspot\'s your-integrations/api-key </span>
+                    </div>',
+			$api_key
 		);
 	}
 
@@ -316,7 +376,47 @@ class Fran_Test_Admin {
 			$new_input['text_color'] = '' ;
 		}
 
+		if( isset( $input['hubspot_api'] ) ) {
+			$new_input['hubspot_api'] = sanitize_text_field( $input['hubspot_api'] );
+		} else {
+			$new_input['hubspot_api'] = '' ;
+		}
 
+
+		if( isset( $input['email_alerts'] ) ) {
+			$one_string = $input['email_alerts'];
+			$allowed_array_raw = preg_split('/\r\n|\r|\n/', $one_string);
+			if ($allowed_array_raw === false) {
+				if (trim($one_string)) {
+					$allowed_array_raw = [$one_string];
+				} else {
+					$allowed_array_raw = [];
+				}
+
+			}
+
+			$allowed_array = [];
+			foreach ($allowed_array_raw as $allowed_raw) {
+				$allowed_raw = trim($allowed_raw,"\"', \t\n\r\0\x0B");
+				if( preg_match("/^\/.+\/[a-z]*$/i",$allowed_raw)) {
+					$allowed = $allowed_raw;
+				} else {
+					if (strpos($allowed_raw, '<') !== false) {
+						$allowed = preg_replace('/.*<(.*)>.*/',"$1",$allowed_raw);
+					} else {
+						$allowed = $allowed_raw;
+					}
+				}
+
+
+				$allowed = sanitize_text_field($allowed);
+				if (!empty($allowed)) {
+					array_push($allowed_array,$allowed);
+				}
+			}
+
+			$new_input['email_alerts'] = $allowed_array;
+		}
 
 
 

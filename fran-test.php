@@ -16,7 +16,7 @@
  * Plugin Name:       Franchise Test
  * Plugin URI:        mailto:willwoodlief@gmail.com
  * Description:       Offers a survey and pushes results to hubspot
- * Version:           1.0.2
+ * Version:           1.0.9
  * Author:            Will Woodlief
  * Author URI:        willwoodlief@gmail.com
  * License:           GPL-2.0+
@@ -36,7 +36,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'PLUGIN_NAME_VERSION', '1.0.0' );
+define( 'PLUGIN_NAME_VERSION', '1.0.9' );
 
 /**
  * The code that runs during plugin activation.

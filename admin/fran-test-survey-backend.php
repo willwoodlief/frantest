@@ -139,7 +139,7 @@ class FranSurveyBackend
 
         $res = $wpdb->get_results( /** @lang text */
                             "
-                select id,anon_key, full_name,phone,survey_email,is_completed,
+                select id,anon_key, first_name,last_name,phone,survey_email,is_completed,
                   UNIX_TIMESTAMP(created_at) as created_at_ts,
                   (answer_count) as number_completed
                 from $table_name s  
@@ -167,7 +167,13 @@ class FranSurveyBackend
 
     /**
      * @param $survey_id
-     * @return array|bool
+     * @return array|false <p>
+     *   array [
+     *          survey=>[id,anon_key,created_at,first_name,last_name,survey_email,phone,
+     *                      completed_at,is_completed,created_at_ts,completed_at_ts],
+     *          answers => array of [question,question_id,answer,answer_id,response_id,shortcode]
+     *  ]
+     * </p>
      * @throws Exception
      */
     public static function get_details_of_one($survey_id) {
@@ -180,7 +186,9 @@ class FranSurveyBackend
 
         /** @noinspection SqlResolve */
         $survey_res = $wpdb->get_results("
-        select id,anon_key,created_at,full_name,survey_email,phone
+        select id,anon_key,created_at,completed_at,is_completed,first_name,last_name,survey_email,phone,
+        		UNIX_TIMESTAMP(created_at) as created_at_ts,
+        		UNIX_TIMESTAMP(completed_at) as completed_at_ts
         from $survey_table_name where id = $survey_id;
         ");
 
@@ -225,6 +233,7 @@ class FranSurveyBackend
 
         return ['survey' => $survey_res[0], 'answers' => $answers_array];
     }
+
 
 
 

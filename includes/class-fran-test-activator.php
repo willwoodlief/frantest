@@ -30,7 +30,7 @@ class Fran_Test_Activator {
 	 * @since    1.0.0
 	 */
 
-	const DB_VERSION = 2.62;
+	const DB_VERSION = 2.7;
 
 	/**
 	 * @return array
@@ -85,7 +85,8 @@ class Fran_Test_Activator {
               completed_at datetime NULL,
               is_completed int NOT NULL default 0,
               survey_email varchar(80) default NULL,
-              full_name text default NULL,
+              first_name text default NULL,
+              last_name text default NULL,
               phone text default NULL,
               comments text default NULL,
               PRIMARY KEY  (id),

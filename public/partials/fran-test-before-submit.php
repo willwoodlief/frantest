@@ -43,6 +43,8 @@ require_once  $head . 'partials/fran-test-before-submit.php';
 	        $step_array[] = $node['shortcode'];
         }
 
+        $percentage = (100.0/sizeof( $json ));
+
         if ($override_key) {
             //redo start step if it fits
             if (array_key_exists($override_key,$step_ref)) {
@@ -80,6 +82,9 @@ require_once  $head . 'partials/fran-test-before-submit.php';
         <?= $error ?>
     </div>
 <?php } ?>
+<link rel="stylesheet" property="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css">
+<link rel="stylesheet" property="stylesheet" href="<?= plugins_url()?>/fran-test/public/css/barfiller_style.css">
+<script type='text/javascript' src='<?= plugins_url()?>/fran-test/public/js/jquery.barfiller.js'></script>
 <script>
     var questions = <?= $question_json ?>;
     var step_reference = <?= $step_ref_json ?>;
@@ -89,17 +94,42 @@ require_once  $head . 'partials/fran-test-before-submit.php';
     var survey_id = <?= $public_test->survey_id ?>;
     var redirect_url = "<?= $redirect_url ?>";
     var text_color = "<?= $text_color ?>";
+    var base_percentage = <?= $percentage ?>;
 
 
     Cookies.set('fran_test', '<?= $public_test->anon_key ?>', { expires: 1, path: '' });
 
 
     jQuery(function($) {
+
+        function updateText(event){
+            var input=$(this);
+            setTimeout(function(){
+                var val=input.val();
+                if(val!=="")
+                    input.parent().addClass("floating-placeholder-float");
+                else
+                    input.parent().removeClass("floating-placeholder-float");
+            },1)
+        }
+        $(".floating-placeholder input").keydown(updateText);
+        $(".floating-placeholder input").change(updateText);
+
+
+        ElementQueries.init(); //start the media query listeners
+
+        $('#bar1').barfiller({duration:1000});
+        if (start_step > 0) {
+            for(var j=0; j < start_step; j++) {
+        //        jQuery('#bar1').barfiller('refill');
+            }
+        }
+
         origonal_title = document.title;
         // Revert to a previously saved state
         setTimeout(function() {
             window.addEventListener('popstate', function(event) {
-                console.log('popstate fired! ' + event.state);
+               // console.log('popstate fired! ' + event.state);
                 var the_state = event.state;
                 if (event.state === null) {
                     the_state = null;
@@ -111,14 +141,29 @@ require_once  $head . 'partials/fran-test-before-submit.php';
         set_question(null,true);
 
         $("#fran-test-ask-words").click(function() {
-            debugger;
-            var name = jQuery( "input[name='fran-test-ask-name']" ).val();
+            var first_name = jQuery( "input[name='fran-test-ask-first-name']" ).val();
+            var last_name = jQuery( "input[name='fran-test-ask-last-name']" ).val();
             var email = jQuery( "input[name='fran-test-ask-email']" ).val();
             var phone = jQuery( "input[name='fran-test-ask-phone']" ).val();
 
+            if ((!first_name.trim()) || (!email.trim() ) ) {
+                // shake
+                $('div.fran-test-ask-words').addClass('shake').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',
+                    function(){
+                        $(this).removeClass('shake');
+                    }
+                );
+
+                $('span.fran-test-need-input').show();
+                return;
+            } else {
+                $('span.fran-test-need-input').hide();
+            }
+
             var pack = {
                 survey_id: survey_id,
-                name: name,
+                first_name: first_name,
+                last_name: last_name,
                 email: email,
                 phone: phone
             };
@@ -130,6 +175,8 @@ require_once  $head . 'partials/fran-test-before-submit.php';
             fran_test_talk_to_frontend('survey_words', pack ,on_success);
 
         });
+
+
 
     });
 
@@ -148,6 +195,18 @@ require_once  $head . 'partials/fran-test-before-submit.php';
         }
         var node = step_reference[question_nick];
 
+
+
+        var percentage = base_percentage * (start_step );
+        if (start_step === step_array.length -1) {
+            percentage = 99;
+        }
+        jQuery('#bar1').barfiller('advance', percentage);
+        jQuery('div.frant-test-progress-detail').text("Question " + (start_step + 1) + " Out Of " + step_array.length + " " );
+
+
+
+        jQuery('div.fran-test-question').text(node.question);
         if ( (!question_nick) || (start_step === (step_array.length -1)) ) {
             set_final_box();
 
@@ -157,7 +216,7 @@ require_once  $head . 'partials/fran-test-before-submit.php';
             start_step ++;
             var next_state = step_array[start_step];
 
-            jQuery('div.fran-test-question').text(node.question);
+
             do_answers(node.answers,next_state);
         }
 
@@ -252,6 +311,9 @@ require_once  $head . 'partials/fran-test-before-submit.php';
 
 </script>
 
+<script type='text/javascript' src='<?= plugins_url()?>/fran-test/public/js/ResizeSensor.js'></script>
+<script type='text/javascript' src='<?= plugins_url()?>/fran-test/public/js/ElementQueries.js'></script>
+
 
 
 
@@ -259,20 +321,43 @@ require_once  $head . 'partials/fran-test-before-submit.php';
 
 <div class="fran-test-public-wrapper"  style="width: 100%; margin: auto">
     <div class="fran-test-header"></div>
-    <div class="fran-test-progress"></div>
+    <div class="fran-test-progress">
+        <div class="frant-test-progress-detail"></div>
+        <div id="bar1" class="barfiller">
+            <span class="tip"></span>
+            <span class="fill" data-percentage="0"></span>
+        </div>
+    </div>
     <div class="fran-test-quiz-holder" style="">
         <div class="fran-test-question"></div>
         <div class="fran-test-answers"></div>
-        <div class="fran-test-ask-words">
+        <div class="fran-test-ask-words animated">
 
-            <input type="text" name="fran-test-ask-name" title="Your Name" placeholder="Your Name" autocomplete="name">
+                <input type="text" name="fran-test-ask-first-name" title="Your Name"  autocomplete="given-name" placeholder="First Name">
+                <br>
+
+
+
+                <input type="text" name="fran-test-ask-last-name" title="Your Name"  autocomplete="family-name" placeholder="Last Name">
             <br>
-            <input type="email" name="fran-test-ask-email" title="Your Email"  placeholder="Your Email" autocomplete="email">
+
+
+
+                <input type="email" name="fran-test-ask-email" title="Your Email"   autocomplete="email" placeholder="Email">
+
             <br>
-            <input type="tel" name="fran-test-ask-phone" title="Your Phone"  placeholder="Your Phone" autocomplete="tel">
+
+
+                <input type="tel" name="fran-test-ask-phone" title="Contact Phone"  autocomplete="tel" placeholder="Phone">
+
             <br>
-            <button type="button" id="fran-test-ask-words">Thank You!</button>
+
+            <button type="button" id="fran-test-ask-words" class="big-button2"><span>Thank You!</span></button> <br>
+            <span class="fran-test-need-input" style="display: none; color:red">Need At Least Email and First Name</span>
         </div>
+    </div>
+    <div class="log">
+
     </div>
 </div>
 

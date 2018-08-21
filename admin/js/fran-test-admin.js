@@ -1,12 +1,12 @@
-var fran_test_ajax_req = null; //active ajax request
+var fran_test_ajax_req = {}; //active ajax request
 
-(function ($) {
+jQuery(function ($) {
 
     fran_test_talk_to_backend('stats', {}, options_success);
 
     function options_success(d) {
        // fran_test_ajax_req = null;
-       let s= "<table><caption>Current Summary</caption><thead><tr><td> </td><td>Avg</td><td>Min</td><td>Max</td></tr></thead><tbody>" +
+       let s= "<table><caption>Current Summary</caption><thead><tr><td> </td><td>Completed</td><td>Earliest</td><td>Latest</td></tr></thead><tbody>" +
        "<tr><td>Amount/When</td> <td><span> "+ d.number_completed + "</span></td> <td><span class='fran-ts'>"+ d.min_created_at_ts + "</span></td> <td><span class='fran-ts'>"+ d.max_created_at_ts +"</span></td> </tr>" ;
 
            "</tbody></table>"
@@ -181,7 +181,7 @@ var fran_test_ajax_req = null; //active ajax request
     $.extend(true, window, {Slick: {Data: {RemoteModel: RemoteModel}}});
     console.log("extension loaded");
 
-})(jQuery);
+});
 
 function fran_test_talk_to_backend(method, server_options, success_callback, error_callback) {
 

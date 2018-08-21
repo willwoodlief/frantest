@@ -82,54 +82,57 @@
 
 
 <script>
+
     var grid, s;
-    var loader = new Slick.Data.RemoteModel();
-    var dobFormatter = function (row, cell, value, columnDef, dataContext) {
-        let d = new Date(dataContext.dob_ts * 1000);
-        let s = '<span>' + d.toLocaleDateString()+  '</span>';
-        return s;
-    };
 
-    var dateFormatter = function (row, cell, value, columnDef, dataContext) {
-        let d = new Date(dataContext.created_at_ts * 1000);
-        let s = '<span>' + d.toLocaleDateString()+  '</span>';
-        return s;
-    };
-    var brandFormatter = function (row, cell, value, columnDef, dataContext) {
-        return dataContext.brand.name;
-    };
-
-    function CheckmarkFormatter(row, cell, value, columnDef, dataContext) {
-        if (value === '0') {
-
-            return dataContext.number_completed;
-        }
-        return value === '1' ? "<img src='../wp-content/plugins/fran-test/admin/css/tick.png'>" : "";
-    }
-
-    var my_columns = [
-
-        {id: "created_at_ts", name: "created at", field: "created_at_ts", formatter: dateFormatter, width: 90, sortable: true},
-        {id: "anon_key", name: "Key", field: "anon_key", formatter: null, width: 80, sortable: true},
-        {id: "full_name", name: "Name", field: "full_name", formatter: null, width: 160, sortable: true},
-        {id: "survey_email", name: "Email", field: "survey_email", formatter: null, width: 200, sortable: true},
-        {id: "phone", name: "Phone", field: "phone", formatter: null, width: 100, sortable: true},
-        {id: "is_completed", name: "Completed", field: "is_completed", formatter: CheckmarkFormatter, width: 100, sortable: true}
-
-
-
-
-    ];
-    var options = {
-        rowHeight: 21,
-        editable: false,
-        enableAddRow: false,
-        enableCellNavigation: false,
-        enableColumnReorder: false
-    };
-    var loadingIndicator = null;
     jQuery(function () {
-        console.log("body js fired");
+        var loader = new Slick.Data.RemoteModel();
+        var dobFormatter = function (row, cell, value, columnDef, dataContext) {
+            let d = new Date(dataContext.dob_ts * 1000);
+            let s = '<span>' + d.toLocaleDateString()+  '</span>';
+            return s;
+        };
+
+        var dateFormatter = function (row, cell, value, columnDef, dataContext) {
+            let d = new Date(dataContext.created_at_ts * 1000);
+            let s = '<span>' + d.toLocaleDateString()+  '</span>';
+            return s;
+        };
+        var brandFormatter = function (row, cell, value, columnDef, dataContext) {
+            return dataContext.brand.name;
+        };
+
+        function CheckmarkFormatter(row, cell, value, columnDef, dataContext) {
+            if (value === '0') {
+
+                return dataContext.number_completed;
+            }
+            return value === '1' ? "<img src='../wp-content/plugins/fran-test/admin/css/tick.png'>" : "";
+        }
+
+        var my_columns = [
+
+            {id: "created_at_ts", name: "created at", field: "created_at_ts", formatter: dateFormatter, width: 90, sortable: true},
+            {id: "anon_key", name: "Key", field: "anon_key", formatter: null, width: 80, sortable: true},
+            {id: "first_name", name: "First", field: "first_name", formatter: null, width: 110, sortable: true},
+            {id: "last_name", name: "Last", field: "last_name", formatter: null, width: 110, sortable: true},
+            {id: "survey_email", name: "Email", field: "survey_email", formatter: null, width: 180, sortable: true},
+            {id: "phone", name: "Phone", field: "phone", formatter: null, width: 100, sortable: true},
+            {id: "is_completed", name: "Completed", field: "is_completed", formatter: CheckmarkFormatter, width: 100, sortable: true}
+
+
+
+
+        ];
+        var options = {
+            rowHeight: 21,
+            editable: false,
+            enableAddRow: false,
+            enableCellNavigation: false,
+            enableColumnReorder: false
+        };
+        var loadingIndicator = null;
+        //console.log("body js fired");
         grid = new Slick.Grid("#myGrid", loader.data, my_columns, options);
 
 
@@ -192,4 +195,5 @@
         // grid.invalidate();
         // grid.render();
     })
+
 </script>
