@@ -13,7 +13,7 @@ class FranSurveyBackend
         $res = $wpdb->get_results(
             " 
             select count(id) number_completed,
-			min(UNIX_TIMESTAMP(created_at)) as min_created_at_ts, max(UNIX_TIMESTAMP(created_at)) as max_created_at_ts
+			min(created_at_ts) as min_created_at_ts, max(created_at_ts) as max_created_at_ts
             from $table_name where is_completed = 1;
             ");
 
@@ -106,7 +106,6 @@ class FranSurveyBackend
             switch ($sort_by) {
 
 	            case 'number_completed':
-                case 'created_at':
 	            case 'created_at_ts':
 	            case 'survey_email':
                 case 'anon_key': {
@@ -140,7 +139,7 @@ class FranSurveyBackend
         $res = $wpdb->get_results( /** @lang text */
                             "
                 select id,anon_key, first_name,last_name,phone,survey_email,is_completed,
-                  UNIX_TIMESTAMP(created_at) as created_at_ts,
+                  created_at_ts,
                   (answer_count) as number_completed
                 from $table_name s  
                 INNER JOIN (
@@ -169,8 +168,8 @@ class FranSurveyBackend
      * @param $survey_id
      * @return array|false <p>
      *   array [
-     *          survey=>[id,anon_key,created_at,first_name,last_name,survey_email,phone,
-     *                      completed_at,is_completed,created_at_ts,completed_at_ts],
+     *          survey=>[id,anon_key,first_name,last_name,survey_email,phone,
+     *                      is_completed,created_at_ts,completed_at_ts],
      *          answers => array of [question,question_id,answer,answer_id,response_id,shortcode]
      *  ]
      * </p>
@@ -186,9 +185,9 @@ class FranSurveyBackend
 
         /** @noinspection SqlResolve */
         $survey_res = $wpdb->get_results("
-        select id,anon_key,created_at,completed_at,is_completed,first_name,last_name,survey_email,phone,
-        		UNIX_TIMESTAMP(created_at) as created_at_ts,
-        		UNIX_TIMESTAMP(completed_at) as completed_at_ts
+        select id,anon_key,is_completed,first_name,last_name,survey_email,phone,
+        		 created_at_ts,
+        		 completed_at_ts
         from $survey_table_name where id = $survey_id;
         ");
 

@@ -182,8 +182,10 @@ require_once  $head . 'partials/fran-test-before-submit.php';
 
     function set_final_box() {
         var answers = jQuery('div.fran-test-answers');
-        answers.html('');
+        answers.html('').hide();
         jQuery('div.fran-test-ask-words').show();
+
+
     }
 
     function set_question(question_nick,b_add_history) {
@@ -212,6 +214,7 @@ require_once  $head . 'partials/fran-test-before-submit.php';
 
         } else {
             jQuery('div.fran-test-ask-words').hide();
+            jQuery('div.fran-test-answers').show();
 
             start_step ++;
             var next_state = step_array[start_step];
@@ -352,7 +355,7 @@ require_once  $head . 'partials/fran-test-before-submit.php';
 
             <br>
 
-            <button type="button" id="fran-test-ask-words" class="big-button2"><span>Thank You!</span></button> <br>
+            <button type="button" id="fran-test-ask-words" class="big-button2"><span>Submit</span></button> <br>
             <span class="fran-test-need-input" style="display: none; color:red">Need At Least Email and First Name</span>
         </div>
     </div>

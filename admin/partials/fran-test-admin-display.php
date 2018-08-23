@@ -173,8 +173,8 @@
             }
         });
         loader.setSearch(jQuery("#ecomhub-fi-search-table").val());
-        loader.setSort("created_at", -1);
-        grid.setSortColumn("created_at", false);
+        loader.setSort("created_at_ts", -1);
+        grid.setSortColumn("created_at_ts", false);
         // load the first page
         grid.onViewportChanged.notify();
 

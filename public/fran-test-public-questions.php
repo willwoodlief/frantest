@@ -60,7 +60,7 @@ class FranTestPublic {
 			'last_name' => $last_name,
 			'phone' => $phone,
 			'is_completed' => 1,
-			'completed_at' => current_time('mysql', 1)
+			'completed_at_ts' => time()
 		];
 
 		$b_check = $wpdb->update(
@@ -240,7 +240,7 @@ class FranTestPublic {
 			$table_name,
 			array(
 				'anon_key' => $anon_key,
-				'created_at' => current_time('mysql', 1)
+				'created_at_ts' => time()
 			),
 			array(
 				'%s',
@@ -384,42 +384,14 @@ class FranTestPublic {
 
 		$options = get_option( 'fran_test_options' );
 		$emails = $options['email_alerts'];
-		if(false && $emails && sizeof($emails) > 0) {
-			$email_to = $emails[0];
-			$email_cc  = array_slice($emails,1);
+		$headers = array('Content-Type: text/html; charset=UTF-8');
+		if( $emails && sizeof($emails) > 0) {
 
-			$response = $engagements->create([
-				"active" => true,
-				"ownerId" => 1,
-				"type" => "EMAIL"
-			], [
-				"contactIds" => [$vid],
-				"companyIds" => [],
-				"dealIds" => [],
-				"ownerIds" => [],
-			], [
-
-				"from" => [
-					"email" => $email_to,
-					"firstName" => "Survey Results",
-					"lastName" => ""
-
-				] ,
-
-				"to" => [
-					"email" => $email_to,
-					"firstName" => "",
-					"lastName" => ""
-
-				] ,
-
-			    "cc" => $email_cc,
-			    "bcc" => [],
-			    "subject" => "Survey Completed",
-			    "html" => $survey_summary_html,
-			    "text"=> $survey_summary_text
-
-			] );
+			$b_what = wp_mail( $emails, "Survey Finished by $first_name $last_name" , $survey_summary_html, $headers );
+			if (!$b_what) {
+				$email_string = implode(", ",$emails);
+				error_log("Cannot email to $email_string . The survey made by $first_name $last_name $email    !");
+			}
 
 		}
 		return $response;
@@ -457,8 +429,8 @@ class FranTestPublic {
 		/**
 		 * @var $info array
 		 * *   array [
-		 *          survey=>[id,anon_key,created_at,first_name,last_name,survey_email,phone,
-		 *                      completed_at,is_completed,completed_at_ts,created_at_ts],
+		 *          survey=>[id,anon_key,first_name,last_name,survey_email,phone,
+		 *                      is_completed,completed_at_ts,created_at_ts],
 		 *          answers => array of [question,question_id,answer,answer_id,response_id,shortcode]
 		 *  ]
 		 */
@@ -491,7 +463,7 @@ class FranTestPublic {
 			$dt->setTimezone($timezone);
 			$when = $dt->format($format);
 			if ($b_html) {
-				$lines[] = "<h1>Survey completed</h1> <h3>$when</h3>";
+				$lines[] = "<h1>Survey completed</h1> <h3>$when</h3>"; //todo look at timezones
 			} else {
 				$lines[] = "Survey completed at $when";
 			}

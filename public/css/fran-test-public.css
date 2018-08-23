@@ -16,21 +16,21 @@ div.fran-test-public-wrapper  div.frant-test-progress-detail {
     text-align: center;
 }
 
-div.fran-test-public-wrapper  div.fran-test-quiz-holder  div.fran-test-question {
-    font-weight: bold;
-    font-size: 2em;
-}
 
 div.fran-test-public-wrapper  div.fran-test-quiz-holder  div.fran-test-question {
     margin-bottom: 1em;
     text-align: center;
     line-height: 1.25em;
+    height: 3em;
+    font-weight: bold;
+    font-size: 2em;
 }
 
 div.fran-test-public-wrapper  div.fran-test-quiz-holder div.fran-test-answers {
     text-align: center;
     margin: auto;
     max-width: 900px;
+    height: 32em ;
 
 }
 

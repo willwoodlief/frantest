@@ -28,7 +28,7 @@ jQuery(function ($) {
         // private
         var PAGESIZE = 50;
         var search_options = {
-            sort_by: 'created_at',
+            sort_by: 'created_at_ts',
             sort_direction: 1,
             search_column: 'anon_key',
             start_index: 0,

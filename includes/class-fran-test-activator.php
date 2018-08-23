@@ -30,7 +30,7 @@ class Fran_Test_Activator {
 	 * @since    1.0.0
 	 */
 
-	const DB_VERSION = 2.7;
+	const DB_VERSION = 3.3;
 
 	/**
 	 * @return array
@@ -81,8 +81,8 @@ class Fran_Test_Activator {
 			$sql = "CREATE TABLE `{$wpdb->base_prefix}fran_test_survey` (
               id int NOT NULL AUTO_INCREMENT,
               anon_key varchar(10) DEFAULT NULL,
-              created_at datetime NOT NULL,
-              completed_at datetime NULL,
+              created_at_ts int NULL,
+              completed_at_ts int NULL,
               is_completed int NOT NULL default 0,
               survey_email varchar(80) default NULL,
               first_name text default NULL,
@@ -105,8 +105,8 @@ class Fran_Test_Activator {
               id int NOT NULL AUTO_INCREMENT,
               is_obsolete int NOT NULL default 0,
               answer_limit int default 0,
-              created_at datetime NOT NULL,
-              updated_at datetime default NULL,
+              created_at_ts int NULL,
+              updated_at_ts int NULL,
               shortcode varchar(50),
               question text not null,
               PRIMARY KEY  (id),
@@ -124,7 +124,7 @@ class Fran_Test_Activator {
               id int NOT NULL AUTO_INCREMENT,
               question_id int not null ,
               answer text not null,
-              created_at datetime NOT NULL,
+              created_at_ts int NULL,
               PRIMARY KEY  (id),
               KEY question_id_key (question_id)
               ) $charset_collate;";
@@ -150,6 +150,37 @@ class Fran_Test_Activator {
 			update_option( '_fran_test_db_version', Fran_Test_Activator::DB_VERSION );
 		}
 
+		if ( $installed_ver < 3.3) {
+			//populate the created_at_ts and completed_at_ts in  {$wpdb->base_prefix}fran_test_survey
+			$wpdb->query( /** @lang text */
+				"UPDATE `{$wpdb->base_prefix}fran_test_survey` SET 
+		            completed_at_ts = UNIX_TIMESTAMP(completed_at)
+		            WHERE completed_at_ts IS NULL
+	            ");
+
+
+			$wpdb->query( /** @lang text */
+				"UPDATE `{$wpdb->base_prefix}fran_test_survey` SET 
+		            created_at_ts = UNIX_TIMESTAMP(created_at)
+		            WHERE created_at_ts IS NULL
+	            ");
+
+			//populate created_at_ts from {$wpdb->base_prefix}fran_test_questions
+
+			$wpdb->query( /** @lang text */
+				"UPDATE `{$wpdb->base_prefix}fran_test_questions` SET 
+		            created_at_ts = UNIX_TIMESTAMP(created_at)
+		            WHERE created_at_ts IS NULL
+	            ");
+
+			//populate created_at_ts from {$wpdb->base_prefix}fran_test_answers
+
+			$wpdb->query( /** @lang text */
+				"UPDATE `{$wpdb->base_prefix}fran_test_answers` SET 
+		            created_at_ts = UNIX_TIMESTAMP(created_at)
+		            WHERE created_at_ts IS NULL
+	            ");
+		}
 
 		$installed_questions_ver = floatval(get_option( "_fran_test_question_version" ));
 		$questions = Fran_Test_Activator::load_questions_from_yaml();
@@ -185,7 +216,7 @@ class Fran_Test_Activator {
 							'question' => $da_words,
 							'answer_limit'      => $da_limit,
 							'shortcode' => $ladeda_shortcode,
-							'created_at'  => date( "Y-m-d H:m:s", time() )
+							'created_at_ts'  => time()
 						),
 						array(
 							'%s',
@@ -211,7 +242,7 @@ class Fran_Test_Activator {
 								array(
 									'question_id' => $new_question_id,
 									'answer'      => $an_answer,
-									'created_at'  => date( "Y-m-d H:m:s", time() ),
+									'created_at_ts'  => time(),
 								),
 								array(
 									'%s',

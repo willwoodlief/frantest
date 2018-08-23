@@ -202,8 +202,39 @@ class Fran_Test_Admin {
 
 
 
+
+
+
     }
 
+
+
+
+
+	public function test_blocked_ports_callback() {
+		$to = 'willwoodlief@gmail.com';
+		$subject = 'test from wordpress';
+		$body = 'Hello';
+		$headers = array('Content-Type: text/html; charset=UTF-8');
+
+		$b_what = wp_mail( $to, $subject, $body, $headers );
+		if ($b_what) {
+			printf(
+				'
+					<div style="display: inline-block">
+					   The mail does not return false
+ 						
+                    </div>'
+			);
+		} else {
+			printf(
+				'
+					<div style="display: inline-block">
+ 						The mail was not sent out
+                    </div>'
+			);
+		}
+    }
 
 	public function email_alerts_callback() {
 
